@@ -46,7 +46,7 @@ if (-not (Test-Path -Path "wsl_update_64.msi" -PathType Leaf -ErrorAction Silent
     Invoke-WebRequest -Uri "https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi" `
         -OutFile "wsl_update_64.msi"
 }
-.\wsl_update_64.msi /passive /promptrestart
+Start-Process -Wait ".\wsl_update_64.msi" -ArgumentList "/passive", "/promptrestart"
 
 # Set default mode to WSL2
 wsl --set-default-version 2 > $null
