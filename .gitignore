@@ -2,3 +2,8 @@ Fedora-*
 fedora-*
 *Xming*
 wsl_update_64.msi
+setup.sh
+xlunch.conf
+entries.dsv
+lxterminal.conf
+setup_xlunch.sh
