@@ -62,15 +62,18 @@ if (-not ((Get-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatfor
 
     Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
     Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux -NoRestart
-    # Update WSL kernel
-    if (-not (Test-Path -Path "wsl_update_64.msi" -PathType Leaf -ErrorAction SilentlyContinue)) {
-        Invoke-WebRequest -Uri "https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi" `
-            -OutFile "wsl_update_64.msi"
-    }
-    .\wsl_update_64.msi /passive
+
     Write-Host "Reboot required.  Run this script again after rebooting."
     Restart-Computer -confirm
 }
+
+# Update WSL kernel
+Write-Host "Installing WSL kernel update..."
+if (-not (Test-Path -Path "wsl_update_64.msi" -PathType Leaf -ErrorAction SilentlyContinue)) {
+    Invoke-WebRequest -Uri "https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi" `
+        -OutFile "wsl_update_64.msi"
+}
+.\wsl_update_64.msi /passive /promptrestart
 
 # Set default mode to WSL2
 wsl --set-default-version 2 > $null
