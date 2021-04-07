@@ -54,8 +54,9 @@ if (-not (Test-Path -Path $fedora_tar -PathType Leaf -ErrorAction SilentlyContin
 }
 
 # Install WSL
-if (-not (Get-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform) `
-    -or -not (Get-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux)) {
+Write-Host "Checking if the WSL Windows featire is installed..."
+if (-not ((Get-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform).State -eq "Enabled") `
+    -or -not ((Get-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux).State -eq "Enabled")) {
 
     Write-Host "Installing the WSL Windows feature..."
 
