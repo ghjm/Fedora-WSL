@@ -26,33 +26,6 @@ if ([Environment]::OSVersion.Version.Build -lt 19042) {
 $wsl_dir = Split-Path $MyInvocation.MyCommand.Path -Parent
 Set-Location -Path $wsl_dir
 
-# Determine the extracted tar filename
-$fedora_tar = $fedora_filename -replace ".xz"
-
-if (-not (Test-Path -Path $fedora_tar -PathType Leaf -ErrorAction SilentlyContinue)) {
-
-    Write-Host "Downloading and installing the Fedora userland tarball..."
-
-    # Download the userland tarball of the Fedora container image
-    if (-not (Test-Path -Path $fedora_filename -PathType Leaf -ErrorAction SilentlyContinue)) {
-        Invoke-WebRequest -Uri $fedora_userland_url -OutFile "fedora-33.20210401-x86_64.tar.xz"
-    }
-
-    # Make sure 7Zip is installed
-    if (-not (Get-Command Expand-7Zip -ErrorAction SilentlyContinue)) {
-        Install-Package -Scope CurrentUser -Force 7Zip4PowerShell > $null
-    }
-
-    # Un-xz the Fedora tarball and move it to the current directory
-    Expand-7Zip -ArchiveFileName $fedora_filename -TargetPath extract
-    Move-Item -Path ("extract\{0}" -f $fedora_tar) -Destination $fedora_tar
-    Remove-Item -Path "extract"
-
-    # Remove the xz file since it is no longer needed
-    Remove-Item -Path $fedora_filename
-
-}
-
 # Install WSL
 Write-Host "Checking if the WSL Windows featire is installed..."
 if (-not ((Get-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform).State -eq "Enabled") `
@@ -77,6 +50,33 @@ if (-not (Test-Path -Path "wsl_update_64.msi" -PathType Leaf -ErrorAction Silent
 
 # Set default mode to WSL2
 wsl --set-default-version 2 > $null
+
+# Determine the extracted tar filename
+$fedora_tar = $fedora_filename -replace ".xz"
+
+if (-not (Test-Path -Path $fedora_tar -PathType Leaf -ErrorAction SilentlyContinue)) {
+
+    Write-Host "Downloading the Fedora userland tarball..."
+
+    # Download the userland tarball of the Fedora container image
+    if (-not (Test-Path -Path $fedora_filename -PathType Leaf -ErrorAction SilentlyContinue)) {
+        Invoke-WebRequest -Uri $fedora_userland_url -OutFile "fedora-33.20210401-x86_64.tar.xz"
+    }
+
+    # Make sure 7Zip is installed
+    if (-not (Get-Command Expand-7Zip -ErrorAction SilentlyContinue)) {
+        Install-Package -Scope CurrentUser -Force 7Zip4PowerShell > $null
+    }
+
+    # Un-xz the Fedora tarball and move it to the current directory
+    Expand-7Zip -ArchiveFileName $fedora_filename -TargetPath extract
+    Move-Item -Path ("extract\{0}" -f $fedora_tar) -Destination $fedora_tar
+    Remove-Item -Path "extract"
+
+    # Remove the xz file since it is no longer needed
+    Remove-Item -Path $fedora_filename
+
+}
 
 # Import the distro
 Write-Host "Importing tarball as WSL distro..."
