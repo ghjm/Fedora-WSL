@@ -1,7 +1,10 @@
-﻿# Constants - set these as appropriate ###################
+﻿#Requires -RunAsAdministrator
+
+##########################################################
+######### Constants - set these as appropriate ###########
+##########################################################
 
 $username = "winuser"       # Linux username
-$wsl_dir = "C:\WSL"
 $fedora_filename = "fedora-33.20210401-x86_64.tar.xz"
 $fedora_userland_url = "https://github.com/fedora-cloud/docker-brew-fedora/raw/33/x86_64/fedora-33.20210401-x86_64.tar.xz"
 $distro_name = "Fedora-33"
@@ -11,17 +14,17 @@ $xlunch_source_url = "https://github.com/Tomas-M/xlunch/archive/refs/tags/v4.7.0
 
 ##########################################################
 
+$ErrorActionPreference = "Stop"
+
 # Verify Windows version
 if ([Environment]::OSVersion.Version.Build -lt 19042) {
     Write-Host "Windows 10 version must be 20H2 or above"
     exit 1
 }
 
-# Create folder to store the distros in
-if (-not (Test-Path -Path $wsl_dir -PathType Container)) {
-    mkdir C:\WSL
-}
-cd C:\WSL
+# cd to the script directory
+$wsl_dir = Split-Path $MyInvocation.MyCommand.Path -Parent
+Set-Location -Path $wsl_dir
 
 # Determine the extracted tar filename
 $fedora_tar = $fedora_filename -replace ".xz"
