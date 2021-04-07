@@ -46,7 +46,7 @@ if (-not (Test-Path -Path "wsl_update_64.msi" -PathType Leaf -ErrorAction Silent
     Invoke-WebRequest -Uri "https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi" `
         -OutFile "wsl_update_64.msi"
 }
-Start-Process -Wait ".\wsl_update_64.msi" -ArgumentList "/passive", "/promptrestart"
+Start-Process -Wait ".\wsl_update_64.msi" -ArgumentList "/quiet", "/promptrestart"
 
 # Set default mode to WSL2
 wsl --set-default-version 2 > $null
@@ -150,6 +150,24 @@ Set-Content -Path lxterminal.conf -NoNewline -Value (@"
 [general]
 fontname=Source Code Pro 12
 color_preset=Tango
+bgcolor=rgb(0,0,0)
+fgcolor=rgb(211,215,207)
+palette_color_0=rgb(0,0,0)
+palette_color_1=rgb(205,0,0)
+palette_color_2=rgb(78,154,6)
+palette_color_3=rgb(196,160,0)
+palette_color_4=rgb(52,101,164)
+palette_color_5=rgb(117,80,123)
+palette_color_6=rgb(6,152,154)
+palette_color_7=rgb(211,215,207)
+palette_color_8=rgb(85,87,83)
+palette_color_9=rgb(239,41,41)
+palette_color_10=rgb(138,226,52)
+palette_color_11=rgb(252,233,79)
+palette_color_12=rgb(114,159,207)
+palette_color_13=rgb(173,127,168)
+palette_color_14=rgb(52,226,226)
+palette_color_15=rgb(238,238,236)
 "@).Replace("`r`n","`n")
 
 
