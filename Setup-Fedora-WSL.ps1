@@ -1,6 +1,6 @@
 ﻿# Constants - set these as appropriate ###################
 
-$username = "winuser"   # change this to your name
+$username = "winuser"       # Linux username
 $wsl_dir = "C:\WSL"
 $fedora_filename = "fedora-33.20210401-x86_64.tar.xz"
 $fedora_userland_url = "https://github.com/fedora-cloud/docker-brew-fedora/raw/33/x86_64/fedora-33.20210401-x86_64.tar.xz"
@@ -173,5 +173,12 @@ Remove-Item -Path setup_xlunch.sh
 Remove-Item -Path xlunch.conf
 Remove-Item -Path entries.dsv
 Remove-Item -Path lxterminal.conf
+
+Write-Host "Creating start menu shortcut..."
+$WshShell = New-Object -comObject WScript.Shell
+$Shortcut = $WshShell.CreateShortcut("$HOME\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\$distro_name.lnk")
+$Shortcut.IconLocation = "%SystemRoot%\System32\SHELL32.dll,48"
+$Shortcut.TargetPath = "$wsl_dir\xlunch.vbs"
+$Shortcut.Save()
 
 Write-Host "Done!"
