@@ -207,6 +207,7 @@ $WshShell = New-Object -comObject WScript.Shell
 $Shortcut = $WshShell.CreateShortcut("$HOME\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\$distro_name.lnk")
 $Shortcut.IconLocation = "%SystemRoot%\System32\SHELL32.dll,48"
 $Shortcut.TargetPath = "$wsl_dir\xlunch.vbs"
+$Shortcut.WorkingDirectory = "$HOME"
 $Shortcut.Save()
 
 Write-Host "Done!"
