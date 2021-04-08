@@ -7,3 +7,5 @@ xlunch.conf
 entries.dsv
 lxterminal.conf
 setup_xlunch.sh
+wsl2-ssh-pageant.exe
+setup_ssh_agent.sh

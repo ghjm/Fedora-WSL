@@ -1,10 +1,10 @@
-﻿#Requires -RunAsAdministrator
+#Requires -RunAsAdministrator
 
 ##########################################################
 ######### Constants - set these as appropriate ###########
 ##########################################################
 
-$username = "winuser"       # Linux username
+$username = "linuxuser"       # Linux username
 $fedora_filename = "fedora-33.20210401-x86_64.tar.xz"
 $fedora_userland_url = "https://github.com/fedora-cloud/docker-brew-fedora/raw/33/x86_64/fedora-33.20210401-x86_64.tar.xz"
 $distro_name = "Fedora-33"
@@ -100,7 +100,7 @@ dnf -y update
 dnf -y install wget curl sudo ncurses dnf-plugins-core dnf-utils passwd findutils \
     bind-utils man man-pages procps-ng psmisc iproute net-tools iputils which telnet nc \
     podman python-devel python3-virtualenv lxterminal firefox python "@Development Tools" \
-    liberation-sans-fonts imlib2-devel libX11-devel
+    liberation-sans-fonts imlib2-devel libX11-devel socat
 if ! id $username >& /dev/null; then
     useradd -G wheel $username
 fi
@@ -202,6 +202,32 @@ Remove-Item -Path xlunch.conf
 Remove-Item -Path entries.dsv
 Remove-Item -Path lxterminal.conf
 
+# Install WSL2 to Pageant bridge
+Write-Host "Installing WSL2-to-Pageant bridge..."
+if (-not (Test-Path -Path "wsl2-ssh-pageant.exe" -PathType Leaf -ErrorAction SilentlyContinue)) {
+    Invoke-WebRequest -Uri "https://github.com/BlackReloaded/wsl2-ssh-pageant/releases/download/v1.2.0/wsl2-ssh-pageant.exe" `
+        -OutFile "wsl2-ssh-pageant.exe"
+}
+
+Set-Content -Path setup_ssh_agent.sh -NoNewline -Value (@"
+mkdir -p /home/$username/.ssh
+chmod 0700 /home/$username/.ssh
+cp wsl2-ssh-pageant.exe /home/$username/.ssh
+chmod 0755 /home/$username/.ssh/wsl2-ssh-pageant.exe
+if ! grep SSH_AUTH_SOCK /home/$username/.bashrc >& /dev/null; then
+  echo '
+# Set up SSH agent passthrough to external Pageant
+export SSH_AUTH_SOCK=`$HOME/.ssh/agent.sock
+ss -a -x | grep -q `$SSH_AUTH_SOCK
+if [ `$? -ne 0 ]; then
+        rm -f `$SSH_AUTH_SOCK
+        (setsid nohup socat UNIX-LISTEN:`$SSH_AUTH_SOCK,fork EXEC:`$HOME/.ssh/wsl2-ssh-pageant.exe >/dev/null 2>&1 &)
+fi' >> /home/$username/.bashrc
+fi
+"@).Replace("`r`n","`n")
+wsl -u $username bash -e setup_ssh_agent.sh
+Remove-Item -Path setup_ssh_agent.sh
+
 Write-Host "Creating start menu shortcut..."
 $WshShell = New-Object -comObject WScript.Shell
 $Shortcut = $WshShell.CreateShortcut("$HOME\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\$distro_name.lnk")
@@ -211,3 +237,4 @@ $Shortcut.WorkingDirectory = "$HOME"
 $Shortcut.Save()
 
 Write-Host "Done!"
+
