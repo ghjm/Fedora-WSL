@@ -83,8 +83,11 @@ Write-Host "Importing tarball as WSL distro..."
 wsl --import "$distro_name" "$wsl_dir\$distro_name" $fedora_tar
 
 # Set the locale
-Write-Host 'Configuring locale.  A "Failed to set locale" error is normal here.'
+Write-Host "Configuring locale...."
+# A "Failed to set locale" error is normal here, so ignore it
+$ErrorActionPreference = "SilentlyContinue"
 wsl -u root bash -c 'dnf -y install glibc-langpack-en && echo ''LANG="en_US.UTF-8"'' > /etc/locale.conf'
+$ErrorActionPreference = "Stop"
 
 # Set up the Fedora instance - install packages, etc
 Write-Host "Configuring Fedora..."
